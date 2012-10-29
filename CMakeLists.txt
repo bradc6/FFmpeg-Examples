@@ -6,6 +6,9 @@ set(FFMPEGEXAMPLE_VERSION 0.1)
 
 set(SOURCE_DIR "./src")
 
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
+
 find_package(Boost COMPONENTS system filesystem exception REQUIRED)
 find_package(FFMPEG REQUIRED)
 
