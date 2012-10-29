@@ -1,0 +1,7 @@
+This repo contains working examples of how to use
+the FFMPEG libraries, due to the cryptic nature and
+lack of documentation. These examples will hopefully
+shed light on it's powers.
+
+All my code is LGPL, if you would like to put me
+in your app's "Thanks" section thats cool too :P
