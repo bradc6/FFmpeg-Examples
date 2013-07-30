@@ -51,20 +51,41 @@ endif()
 
 #If you have a user include/lib directory prefix that
 #is not in the standand location
-include_directories("~/dev/fakeroot/include")
-link_directories("~/dev/fakeroot/lib")
+#include_directories("~/dev/fakeroot/include")
+#link_directories("~/dev/fakeroot/lib")
+
+#The different parts of ffmpeg to link to
+#            ${FFMPEG_LIBAVCODEC_LIBRARIES}
+#            ${FFMPEG_LIBAVFORMAT_LIBRARIES}
+#            ${FFMPEG_LIBAVUTIL_LIBRARIES}
+#            ${FFMPEG_LIBSWRESAMPLE_LIBRARIES}
 
 add_executable(encodeAudio ${ENCODEAUDIOTONE_SOURCE})
-target_link_libraries(encodeAudio ${FFMPEG_LIBRARIES})
+target_link_libraries(encodeAudio ${FFMPEG_LIBAVCODEC_LIBRARIES} 
+								  ${FFMPEG_LIBAVFORMAT_LIBRARIES} 
+								  ${FFMPEG_LIBAVUTIL_LIBRARIES}
+								  ${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
 
 add_executable(decodeAudioPCMWav ${DECODEAUDIOPCMWAV_SOURCE})
-target_link_libraries(decodeAudioPCMWav ${FFMPEG_LIBRARIES})
+target_link_libraries(decodeAudioPCMWav ${FFMPEG_LIBAVCODEC_LIBRARIES} 
+								  		${FFMPEG_LIBAVFORMAT_LIBRARIES} 
+								  		${FFMPEG_LIBAVUTIL_LIBRARIES}
+								  		${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
 
 add_executable(audioFormatDetection ${AUDIOFORMATDETECTION_SOURCE})
-target_link_libraries(audioFormatDetection ${FFMPEG_LIBRARIES})
+target_link_libraries(audioFormatDetection ${FFMPEG_LIBAVCODEC_LIBRARIES} 
+								  		   ${FFMPEG_LIBAVFORMAT_LIBRARIES} 
+								  		   ${FFMPEG_LIBAVUTIL_LIBRARIES}
+								  		   ${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
 
 add_executable(decodeEncode ${DECODEENCODE_SOURCE})
-target_link_libraries(decodeEncode ${FFMPEG_LIBRARIES})
+target_link_libraries(decodeEncode ${FFMPEG_LIBAVCODEC_LIBRARIES} 
+								   ${FFMPEG_LIBAVFORMAT_LIBRARIES} 
+								   ${FFMPEG_LIBAVUTIL_LIBRARIES}
+								   ${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
 
 add_executable(decodeEncodeResample ${DECODEENCODERESAMPLE_SOURCE})
-target_link_libraries(decodeEncodeResample ${FFMPEG_LIBRARIES})
+target_link_libraries(decodeEncodeResample ${FFMPEG_LIBAVCODEC_LIBRARIES} 
+								  		   ${FFMPEG_LIBAVFORMAT_LIBRARIES} 
+								  		   ${FFMPEG_LIBAVUTIL_LIBRARIES}
+								           ${FFMPEG_LIBSWRESAMPLE_LIBRARIES})
