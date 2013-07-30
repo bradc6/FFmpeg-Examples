@@ -66,12 +66,72 @@ int main()
     //But for a tone it is fine.
     mp2EncoderProperties->bit_rate = 64000;
     
-    //There are many different type of PCM (Pulse-code Modulation) Audio
+    //There are many different types of Audio input
     //We need to ensure that the encoder is able to understand the input
     //If not we have to resample the input to fit the codec
     //(In example decodeEncodeResample build target)
+    //We will attempt to use s16 PCM Audio
     
+    //We can work to ensure this input format works by querying
+    //the different inputs offered with out own little function.
+    if(CheckCodecSupportofSampleFormat(mp2Codec, AV_SAMPLE_FMT_S16))
+    {
+        mp2EncoderProperties->sample_fmt = AV_SAMPLE_FMT_S16;
+    }
+    else
+    {
+        std::cout << "The input sample format is not available for that specific codec\n";
+        exit(-3);
+    }
     
+    //For out purposes (We are generating a tone to encode)
+    //We will simple use the max available settings of the codec
+    mp2EncoderProperties->sample_rate = GetHighestSamplerate(mp2Codec);
     
 	return 0;
+}
+
+bool CheckCodecSupportofSampleFormat(const AVCodec *targetCodec, const enum AVSampleFormat targetSampleFormat)
+{
+    //Make a pointer to a enumeration of all the supported
+    //sample formats, then run down that list in search of that sample format
+    for(const enum AVSampleFormat *currentSampleFormatAttempt = targetCodec->sample_fmts;
+        *currentSampleFormatAttempt != AV_SAMPLE_FMT_NONE;
+        currentSampleFormatAttempt++)
+    {
+        if(*currentSampleFormatAttempt == targetSampleFormat)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+int GetHighestSamplerate(const AVCodec *targetCodec)
+{
+    //The best supported sample rate we have
+    //found so far
+    int bestSampleRate = 0;
+
+    //If the codec does not have a set of sampleRates
+    //set a default accepted value
+    if(!targetCodec->supported_samplerates)
+    {
+        return 44100;
+    }
+    
+    const int *currentSampleRateAttempt = targetCodec->supported_samplerates;
+    
+    //Otherwise lets roll through the different sample rates that are offered
+    for(; *currentSampleRateAttempt; currentSampleRateAttempt++)
+    {
+        bestSampleRate = FFMAX(*currentSampleRateAttempt, bestSampleRate);
+    }
+    
+    return bestSampleRate;
+}
+
+int GetHighestChannelLayout(const AVCodec *targetCodec)
+{
+    
 }
