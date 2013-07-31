@@ -1,6 +1,17 @@
 #ifndef EncodeAudio_Header
 #define EncodeAudio_Header
 
+//Allow Windows to use 8/16/32/64 byte values
+#if defined(_WIN32)
+#include <stdint.h>
+typedef uint8_t u_int8_t;
+typedef uint16_t u_int16_t;
+typedef uint32_t u_int32_t;
+typedef uint64_t u_int64_t;
+#else
+    #include <inttypes.h>
+#endif
+
 //Since the libraries are written in C, we need to tell
 //the linker to link the libraries as C code. Otherwise
 //compilation will still succeed but linking will not
@@ -15,7 +26,7 @@ extern "C"
     #include <libavutil/mathematics.h>
     #include <libavutil/samplefmt.h>
 }
-
+#include <fstream>
 #include <math.h>
 
 //!Checks whether a specific sample format is compatible
@@ -39,6 +50,6 @@ int GetHighestSamplerate(const AVCodec *targetCodec);
  * \pre targetCodec must be defined and preloaded
  * \post Returns the maximum channel layout provided by the codec
  *\note NA*/
-int GetHighestChannelLayout(const AVCodec *targetCodec);
+int GetHighestChannelLayout(AVCodec *targetCodec);
 
 #endif

@@ -8,6 +8,7 @@ int main()
     
     
     //Registers underling FFMPEG
+    
 #warning Need to be replaced with the code to register only MP2
     avcodec_register_all();
     
@@ -88,6 +89,57 @@ int main()
     //We will simple use the max available settings of the codec
     mp2EncoderProperties->sample_rate = GetHighestSamplerate(mp2Codec);
     
+    //Next we will set the channel layout with the most available
+    //channels
+    mp2EncoderProperties->channel_layout = GetHighestChannelLayout(mp2Codec);
+    
+    //Now that we have the channel layout to be using, for this example the
+    //tone we generate will be for the maximum channels available in the layout
+    mp2EncoderProperties->channels = av_get_channel_layout_nb_channels(mp2EncoderProperties->channel_layout);
+    
+    //We have finally got all the properties of the encoder (mp2Codec)
+    //and it's properties configured (mp2EncoderProperties) lets open the Encoder
+    //When opening the codec fails it will return a negative value, which can be caught
+    //and controll the error. For this example simple fail out of the app
+    if(avcodec_open2(mp2EncoderProperties, mp2Codec, NULL))
+    {
+        std::cout << "Not able to open the codec. One of the properties set incorrectly?\n";
+        exit(-4);
+    }
+    
+    //AVFrame is a data structure that contains the raw audio
+    //from the inputed audio file/source
+    AVFrame *currentAudioFrame;
+    
+    //We need to allocate the memory for this AVFrame
+    currentAudioFrame = avcodec_alloc_frame();
+    
+    //If memory for the frame could not be allocated
+    //We need to fail out
+    if(!currentAudioFrame)
+    {
+        std::cout << "Could allocate enough memory for an AVFrame\n";
+        exit(-5);
+    }
+    
+    //With the AVFrame allocated
+    //We will set the AVFrame with the same settings as out mp2EncoderProperties
+    //Set the number of samples expected for the frame
+    currentAudioFrame->nb_samples = mp2EncoderProperties->frame_size;
+    
+    //Set the AVFrame sample format to expect
+    currentAudioFrame->format = mp2EncoderProperties->sample_fmt;
+    
+    //Set the AVFrame channel layout to expect
+    currentAudioFrame->channel_layout = mp2EncoderProperties->channel_layout;
+    
+    //Now that the encoder is ready lets open the file to write to
+    std::ofstream outMP2Audio;
+    outMP2Audio.open("encodeAudioOutput.mp2");
+    
+    //Finished writing to the file
+    //Close the file to rid us of the lock
+    outMP2Audio.close();
 	return 0;
 }
 
@@ -131,7 +183,30 @@ int GetHighestSamplerate(const AVCodec *targetCodec)
     return bestSampleRate;
 }
 
-int GetHighestChannelLayout(const AVCodec *targetCodec)
+int GetHighestChannelLayout(AVCodec *targetCodec)
 {
+    const uint64_t *currentChannelLayoutAttempt;
+    int bestNumberofAvailableChannels = 0;
+    uint64_t bestChannelLayout = 0;
     
+    //If the codec does not have a list of
+    //supported channel layouts, default to stereo
+    if(!targetCodec->channel_layouts)
+    {
+        return AV_CH_LAYOUT_STEREO;
+    }
+    
+    currentChannelLayoutAttempt = targetCodec->channel_layouts;
+    
+    for(;currentChannelLayoutAttempt; currentChannelLayoutAttempt++)
+    {
+        int numberOfChannelsAvailable = av_get_channel_layout_nb_channels(*currentChannelLayoutAttempt);
+        
+        if(bestNumberofAvailableChannels < numberOfChannelsAvailable)
+        {
+            bestChannelLayout = *currentChannelLayoutAttempt;
+            bestNumberofAvailableChannels = numberOfChannelsAvailable;
+        }
+    }
+    return bestChannelLayout;
 }
